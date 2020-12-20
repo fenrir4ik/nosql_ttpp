@@ -2,6 +2,7 @@
 Reports for NoSQL and Technologies and design patterns
 
 Технології та патерни проектування
+
 1 ВИКОРИСТАННЯ ПАТТЕРНА DAO І ПАТЕРНІВ ПРОЕКТУВАННЯ: SINGLETON, BUILDER, FACTORY METHOD
 Модуль: MyDAO (DAOFactory.java, MySQLDAO.java, DAOFactory.java), Flowers (Plant.java (Builder)) 
 
@@ -13,6 +14,7 @@ Reports for NoSQL and Technologies and design patterns
 
 
 NoSQL
+
 1 Проектування і розробка програми роботи з БД
 Модуль: Flowers (Database_interaction.java)
 
