@@ -12,6 +12,9 @@ Reports for NoSQL and Technologies and design patterns
 3 Використання паттерна хранитель (Memento)
 Модуль: Memento, Flowers
 
+3 Використання паттерна хранитель (Proxy)
+Модуль: Proxy
+
 
 NoSQL
 
