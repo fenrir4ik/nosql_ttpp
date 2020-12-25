@@ -7,12 +7,13 @@ Reports for NoSQL and Technologies and design patterns
 Модуль: MyDAO (DAOFactory.java, MySQLDAO.java, DAOFactory.java), Flowers (Plant.java (Builder)) 
 
 2 Використання паттерна Observer (Listener)
+
 Модуль: Observer, MyDAO
 
 3 Використання паттерна хранитель (Memento)
 Модуль: Memento, Flowers
 
-3 Використання паттерна хранитель (Proxy)
+4 Використання паттерна хранитель (Proxy)
 Модуль: Proxy
 
 
