@@ -1,11 +1,16 @@
 package ua.nure.st.kpp.example.demo.MyDAO;
 
-
+import org.jvnet.hk2.spring.bridge.api.SpringIntoHK2Bridge;
 import ua.nure.st.kpp.example.demo.Flowers.Plant;
 import ua.nure.st.kpp.example.demo.Observer.PlantObservable;
+import ua.nure.st.kpp.example.demo.Proxy.Status;
+import ua.nure.st.kpp.example.demo.Proxy.User;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
+
+import static ua.nure.st.kpp.example.demo.Proxy.Status.*;
 
 
 public class MySQLDAO implements IDAO{
@@ -17,12 +22,14 @@ public class MySQLDAO implements IDAO{
 	private static String add_plant = "INSERT INTO Plant (look_id, ground_id, plant_name, temperature, plant_type, height, age) VALUES(?, ?, ?, ?, ?, ?, ?)";
 	private static String get_look_id = "select id from look where leaf_type = ? LIMIT 1";
 	private static String get_ground_id = "select id from ground where ground_name = ? and ground_description = ? LIMIT 1";
-	private static String get_plant_by_type = "select id, plant_type, leaf_type, plant_name, temperature, ground_name, ground_description, age, height from plant join look on plant.look_id = look.id join Ground on ground.id = plant.ground_id where ground_name = ?";
+	private static String get_plant_by_type = "select plant.id, plant_type, leaf_type, plant_name, temperature, ground_name, ground_description, age, height from plant join look on plant.look_id = look.id join Ground on ground.id = plant.ground_id where ground_name = ?";
 	private static String edit_plant_ground_by_plant_name = "update plant set ground_id = ? where plant_name = ?";
 	private static String delete_plant_by_name = "DELETE FROM Plant WHERE plant_name = ?;";
 	private static String get_all_plants = "select plant.id, plant_type, leaf_type, plant_name, temperature, ground_name, ground_description, age, height from plant join look on plant.look_id = look.id join Ground on ground.id = plant.ground_id";
 	private static String get_plants_by_name = "select plant.id, plant_type, leaf_type, plant_name, temperature, ground_name, ground_description, age, height from plant join look on plant.look_id = look.id join Ground on ground.id = plant.ground_id where plant_name = ?";
 	private static String restore_plant = "UPDATE PLANT set id = ?, look_id = ?, ground_id = ?, plant_name = ?, temperature = ?, plant_type = ?, height = ?, age = ? where id = ?";
+	private static String reg_usr = "insert into user(login, password) select ?, ? where not exists(select id from user where login = ?)";
+	private static String get_usr = "select id, login, password, fk_status from user where login = ? and password = ?";
 
 
 	public MySQLDAO() {
@@ -48,8 +55,9 @@ public class MySQLDAO implements IDAO{
 	}
 
 	@Override
-	public Plant Insert_Plant(Plant plant) {
+	public Plant Insert_Plant(Plant plant, Status st) {
 		try {
+			if (st == ADMIN) {
 			PreparedStatement insert_ground = con.prepareStatement(add_ground);
 			PreparedStatement insert_look = con.prepareStatement(add_look);
 			PreparedStatement insert_plant = con.prepareStatement(add_plant, Statement.RETURN_GENERATED_KEYS);
@@ -94,6 +102,11 @@ public class MySQLDAO implements IDAO{
 			ArrayList<Plant> plants = new ArrayList<Plant>();
 			plants.add(plant);
 			events.notifyObservers("Add", plants);
+			}
+			else
+			{
+				System.out.println("Недостаточно прав для соверешения операции");
+			}
 		} catch (Exception ex) {
 			System.out.println("Query failed...");
 			System.out.println(ex);
@@ -184,7 +197,7 @@ public class MySQLDAO implements IDAO{
 			ResultSet resultSet = get_plant.executeQuery();
 			ArrayList<Plant> result = new ArrayList<Plant>();
 			while (resultSet.next()) {
-				result.add(new Plant(resultSet.getInt("id"),
+				result.add(new Plant(resultSet.getInt("plant.id"),
 						resultSet.getString("plant_type"),
 						resultSet.getString("leaf_type"),
 						resultSet.getString("plant_name"),
@@ -210,7 +223,7 @@ public class MySQLDAO implements IDAO{
 			ResultSet resultSet = get_plant.executeQuery();
 			ArrayList<Plant> result = new ArrayList<Plant>();
 			while (resultSet.next()) {
-				result.add(new Plant(resultSet.getInt("id"),
+				result.add(new Plant(resultSet.getInt("plant.id"),
 						resultSet.getString("plant_type"),
 						resultSet.getString("leaf_type"),
 						resultSet.getString("plant_name"),
@@ -229,8 +242,9 @@ public class MySQLDAO implements IDAO{
 	}
 
 	@Override
-	public void ChangeGround(String plant_name, String ground_name, String ground_desription) {
+	public void ChangeGround(String plant_name, String ground_name, String ground_desription, Status st) {
 		try {
+			if (st == ADMIN) {
 			PreparedStatement edit_ground = con.prepareStatement(edit_plant_ground_by_plant_name);
 			ArrayList<Plant> plants = Get_Plants_By_Name(plant_name);
 			PreparedStatement insert_ground = con.prepareStatement(add_ground);
@@ -252,6 +266,11 @@ public class MySQLDAO implements IDAO{
 			edit_ground.setString(2, plant_name);
 			edit_ground.executeUpdate();
 			events.notifyObservers("Edit", plants);
+			}
+			else
+			{
+				System.out.println("Недостаточно прав для соверешения операции");
+			}
 		} catch (Exception ex) {
 			System.out.println("Query failed...");
 			System.out.println(ex);
@@ -259,13 +278,19 @@ public class MySQLDAO implements IDAO{
 	}
 
 	@Override
-	public void DeletePlantByName(String plant_name) {
+	public void DeletePlantByName(String plant_name, Status st) {
 		try {
-			ArrayList<Plant> plants = Get_Plants_By_Name(plant_name);
-			PreparedStatement delete_plant = con.prepareStatement(delete_plant_by_name);
-			delete_plant.setString(1, plant_name);
-			delete_plant.executeUpdate();
-			events.notifyObservers("Delete", plants);
+			if (st == ADMIN) {
+				ArrayList<Plant> plants = Get_Plants_By_Name(plant_name);
+				PreparedStatement delete_plant = con.prepareStatement(delete_plant_by_name);
+				delete_plant.setString(1, plant_name);
+				delete_plant.executeUpdate();
+				events.notifyObservers("Delete", plants);
+			}
+			else
+			{
+				System.out.println("Недостаточно прав для соверешения операции");
+			}
 		} catch (Exception ex) {
 			System.out.println("Query failed...");
 			System.out.println(ex);
@@ -285,6 +310,51 @@ public class MySQLDAO implements IDAO{
 		catch (SQLException ex)
 		{
 			System.out.println(ex.getMessage());
+		}
+	}
+
+	public void register_user(User usr)
+	{
+		try {
+			PreparedStatement query = con.prepareStatement(reg_usr);
+			query.setString(1, usr.getLogin());
+			query.setString(2, usr.getPass());
+			query.setString(3, usr.getLogin());
+			query.executeUpdate();
+
+		} catch (Exception ex) {
+			System.out.println("Query failed...");
+			System.out.println(ex);
+		}
+	}
+
+	public Status login_user(User usr)
+	{
+		try {
+			PreparedStatement query = con.prepareStatement(get_usr);
+			query.setString(1, usr.getLogin());
+			query.setString(2, usr.getPass());
+
+			ResultSet resultSet = query.executeQuery();
+			int counter = 0;
+			if (resultSet.next()) {
+				//select id, login, password, fk_status
+				counter++;
+				if (resultSet.getInt("fk_status") == 1){
+					return USER;
+				}
+				else {
+					return ADMIN;
+				}
+			}
+			else
+			{
+				return None;
+			}
+		} catch (Exception ex) {
+			System.out.println("Query failed...");
+			System.out.println(ex);
+			return None;
 		}
 	}
 }

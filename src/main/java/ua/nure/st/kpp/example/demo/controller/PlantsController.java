@@ -11,6 +11,7 @@ import ua.nure.st.kpp.example.demo.MyDAO.*;
 import ua.nure.st.kpp.example.demo.Flowers.Plant;
 import ua.nure.st.kpp.example.demo.Observer.DAOObserver;
 import ua.nure.st.kpp.example.demo.Observer.PlantObservable;
+import ua.nure.st.kpp.example.demo.Proxy.Status;
 import ua.nure.st.kpp.example.demo.StringPlantPair.PlantPair;
 import ua.nure.st.kpp.example.demo.form.AddPlantForm;
 import ua.nure.st.kpp.example.demo.form.DeletePlantForm;
@@ -52,7 +53,7 @@ public class PlantsController {
 	@RequestMapping(value = { "/addplant" }, method = RequestMethod.POST)
 	public String addPlant(Model model, AddPlantForm plant) {
 
-		dao.Insert_Plant(new Plant(0, plant.getPlant_type(), plant.getLeaf_type(), plant.getName(), plant.getTemperature(), plant.getGround_name(), plant.getGround_description(), plant.getAge(), plant.getHeight()));
+		dao.Insert_Plant(new Plant(0, plant.getPlant_type(), plant.getLeaf_type(), plant.getName(), plant.getTemperature(), plant.getGround_name(), plant.getGround_description(), plant.getAge(), plant.getHeight()), Status.ADMIN);
 		return "redirect:/plants";
 	}
 
@@ -68,7 +69,7 @@ public class PlantsController {
 	@RequestMapping(value = { "/deleteplantbyname" }, method = RequestMethod.POST)
 	public String deletePlant(Model model, DeletePlantForm deletePlantForm) {
 
-		dao.DeletePlantByName(deletePlantForm.getPlantName());
+		dao.DeletePlantByName(deletePlantForm.getPlantName(), Status.ADMIN);
 
 		return "redirect:/plants";
 	}
@@ -84,7 +85,7 @@ public class PlantsController {
 	@RequestMapping(value = { "/editgroundbyname" }, method = RequestMethod.POST)
 	public String EditPlantGround(Model model, EditPlantGroundForm editGroundForm) {
 
-		dao.ChangeGround(editGroundForm.getPlantName(), editGroundForm.getGroundName(), editGroundForm.getGroundDescr());
+		dao.ChangeGround(editGroundForm.getPlantName(), editGroundForm.getGroundName(), editGroundForm.getGroundDescr(), Status.ADMIN);
 
 		return "redirect:/plants";
 	}

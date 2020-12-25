@@ -8,15 +8,20 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import ua.nure.st.kpp.example.demo.Flowers.Plant;
 import ua.nure.st.kpp.example.demo.MyDAO.IDAO;
+import com.mongodb.client.model.Aggregates.*;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
+import ua.nure.st.kpp.example.demo.Proxy.Status;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 import static com.mongodb.client.model.Accumulators.avg;
 import static com.mongodb.client.model.Accumulators.max;
+import static com.mongodb.client.model.Aggregates.count;
 import static com.mongodb.client.model.Aggregates.match;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.*;
@@ -43,7 +48,7 @@ public class MongoDbDAO implements IDAO {
     }
 
     @Override
-    public Plant Insert_Plant(Plant plant) {
+    public Plant Insert_Plant(Plant plant, Status st) {
         try {
             MongoCollection todoCollection = database.getCollection("plant");
 
@@ -106,14 +111,14 @@ public class MongoDbDAO implements IDAO {
     }
 
     @Override
-    public void ChangeGround(String plant_name, String ground_name, String ground_desription) {
+    public void ChangeGround(String plant_name, String ground_name, String ground_desription, Status st) {
         MongoCollection coll = database.getCollection("plant");
         coll.updateOne(new Document("plant_name", plant_name),
                 new Document("$set", new Document("ground.ground_name", ground_name).append("ground.ground_description", ground_desription)));
     }
 
     @Override
-    public void DeletePlantByName(String plant_name) {
+    public void DeletePlantByName(String plant_name, Status st) {
         MongoCollection coll = database.getCollection("plant");
         coll.deleteMany(new Document("plant_name", plant_name));
     }

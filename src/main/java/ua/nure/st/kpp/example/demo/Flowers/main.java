@@ -11,27 +11,3 @@ public class main {
 
     }
 }
-
-
-
-
-
-
-/*
-
-        ArrayList<Plant> q_res = Database_Interaction.SelectByGroundName("Песок");
-        for (Plant plant: q_res)
-        {
-                plant.get_Description();
-                System.out.println();
-        }
-
-        Database_Interaction.Insert_Blooming_Plant(a);
-        Database_Interaction.Insert_Blooming_Plant(b);
-        Database_Interaction.Insert_Coniferous_Plant(c);
-
-        Database_Interaction.ChangeGround("Пещаный кактус", "Чернозём", "Очень родючая почва");
-        Database_Interaction.DeletePlantByName("Ель простая");
-
-
- */

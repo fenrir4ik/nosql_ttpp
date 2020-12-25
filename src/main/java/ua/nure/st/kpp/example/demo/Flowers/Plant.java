@@ -100,6 +100,7 @@ public class Plant implements Comparable<Plant>
         this.leaf_type = builder.leaf_type;
     }
 
+
     public long getId() {
         return id;
     }
@@ -107,6 +108,7 @@ public class Plant implements Comparable<Plant>
     public void setId(long id) {
         this.id = id;
     }
+
 
     public Memento saveState() {
         return new Memento(this);
